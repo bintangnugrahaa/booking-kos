@@ -34,7 +34,7 @@ class BoardingHouseController extends Controller
     }
 
     /**
-     * Show the boarding house find page with available categories and cities.
+     * Show the page for finding boarding houses.
      *
      * @return \Illuminate\View\View
      */
@@ -44,5 +44,46 @@ class BoardingHouseController extends Controller
         $cities = $this->cityRepository->getAllCities();
 
         return view('pages.boarding-house.find', compact('categories', 'cities'));
+    }
+
+    /**
+     * Show details of a specific boarding house.
+     *
+     * @param string $slug
+     * @return \Illuminate\View\View
+     */
+    public function show($slug)
+    {
+        $boardingHouse = $this->boardingHouseRepository->getBoardingHouseBySlug($slug);
+        return view('pages.boarding-house.show', compact('boardingHouse'));
+    }
+
+    /**
+     * Show room details of a specific boarding house.
+     *
+     * @param string $slug
+     * @return \Illuminate\View\View
+     */
+    public function rooms($slug)
+    {
+        $boardingHouse = $this->boardingHouseRepository->getBoardingHouseBySlug($slug);
+        return view('pages.boarding-house.rooms', compact('boardingHouse'));
+    }
+
+    /**
+     * Show filtered list of boarding houses based on search, city, and category.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\View\View
+     */
+    public function findResults(Request $request)
+    {
+        $boardingHouses = $this->boardingHouseRepository->getAllBoardingHouses(
+            $request->search,
+            $request->city,
+            $request->category
+        );
+
+        return view('pages.boarding-house.index', compact('boardingHouses'));
     }
 }
