@@ -18,15 +18,15 @@ interface BoardingHouseRepositoryInterface
     public function getAllBoardingHouses(?string $search = null, ?string $city = null, ?string $category = null);
 
     /**
-     * Get the most popular boarding houses with an optional limit.
+     * Get popular boarding houses.
      *
-     * @param int $limit
+     * @param int $limit Number of items to retrieve
      * @return mixed
      */
     public function getPopularBoardingHouses(int $limit = 5);
 
     /**
-     * Get a boarding house by its city slug.
+     * Get boarding houses by city slug.
      *
      * @param string $slug
      * @return mixed
@@ -34,7 +34,7 @@ interface BoardingHouseRepositoryInterface
     public function getBoardingHouseByCitySlug(string $slug);
 
     /**
-     * Get a boarding house by its category slug.
+     * Get boarding houses by category slug.
      *
      * @param string $slug
      * @return mixed
@@ -42,10 +42,18 @@ interface BoardingHouseRepositoryInterface
     public function getBoardingHouseByCategorySlug(string $slug);
 
     /**
-     * Get a boarding house by its unique slug.
+     * Get a boarding house by its slug.
      *
      * @param string $slug
      * @return mixed
      */
     public function getBoardingHouseBySlug(string $slug);
+
+    /**
+     * Get room details by ID.
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getBoardingHouseRoomById($id);
 }
