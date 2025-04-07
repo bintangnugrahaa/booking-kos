@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Interfaces\BoardingHouseRepositoryInterface;
 use App\Models\BoardingHouse;
+use App\Models\Room;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
 /**
@@ -91,5 +92,16 @@ class BoardingHouseRepository implements BoardingHouseRepositoryInterface
     public function getBoardingHouseBySlug($slug)
     {
         return BoardingHouse::where('slug', $slug)->first();
+    }
+
+    /**
+     * Get a room by its ID.
+     *
+     * @param int $id
+     * @return \App\Models\Room|null
+     */
+    public function getBoardingHouseRoomById($id)
+    {
+        return Room::find($id);
     }
 }
