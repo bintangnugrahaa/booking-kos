@@ -15,6 +15,12 @@ class BookingController extends Controller
     private BoardingHouseRepositoryInterface $boardingHouseRepository;
     private TransactionRepositoryInterface $transactionRepository;
 
+    /**
+     * BookingController constructor.
+     *
+     * @param BoardingHouseRepositoryInterface $boardingHouseRepository
+     * @param TransactionRepositoryInterface $transactionRepository
+     */
     public function __construct(
         BoardingHouseRepositoryInterface $boardingHouseRepository,
         TransactionRepositoryInterface $transactionRepository
@@ -26,7 +32,7 @@ class BookingController extends Controller
     /**
      * Handle booking request and store data in session.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $slug
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -64,7 +70,7 @@ class BookingController extends Controller
     /**
      * Save customer information from the booking form.
      *
-     * @param \App\Http\Requests\CustomerInformationStoreRequest $request
+     * @param CustomerInformationStoreRequest $request
      * @param string $slug
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -74,5 +80,20 @@ class BookingController extends Controller
         $this->transactionRepository->saveTransactionDataToSession($data);
 
         return redirect()->route('booking.checkout', $slug);
+    }
+
+    /**
+     * Show the booking checkout page.
+     *
+     * @param string $slug
+     * @return \Illuminate\View\View
+     */
+    public function checkout($slug)
+    {
+        $transaction = $this->transactionRepository->getTransactionDataFromSession();
+        $boardingHouse = $this->boardingHouseRepository->getBoardingHouseBySlug($slug);
+        $room = $this->boardingHouseRepository->getBoardingHouseRoomById($transaction['room_id']);
+
+        return view('pages.booking.checkout', compact('transaction', 'boardingHouse', 'room'));
     }
 }
