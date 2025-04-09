@@ -6,38 +6,23 @@ use App\Interfaces\BoardingHouseRepositoryInterface;
 use App\Interfaces\CityRepositoryInterface;
 use Illuminate\Http\Request;
 
-/**
- * Controller for handling city-related actions.
- */
 class CityController extends Controller
 {
-    private BoardingHouseRepositoryInterface $boardingHouseRepository;
-    private CityRepositoryInterface $cityRepository;
+    private BoardingHouseRepositoryInterface $boardingHouseRepo;
+    private CityRepositoryInterface $cityRepo;
 
-    /**
-     * CityController constructor.
-     *
-     * @param BoardingHouseRepositoryInterface $boardingHouseRepository
-     * @param CityRepositoryInterface $cityRepository
-     */
     public function __construct(
-        BoardingHouseRepositoryInterface $boardingHouseRepository,
-        CityRepositoryInterface $cityRepository
+        BoardingHouseRepositoryInterface $boardingHouseRepo,
+        CityRepositoryInterface $cityRepo
     ) {
-        $this->boardingHouseRepository = $boardingHouseRepository;
-        $this->cityRepository = $cityRepository;
+        $this->boardingHouseRepo = $boardingHouseRepo;
+        $this->cityRepo = $cityRepo;
     }
 
-    /**
-     * Show boarding houses by city slug.
-     *
-     * @param string $slug
-     * @return \Illuminate\View\View
-     */
-    public function show($slug)
+    public function show(string $slug)
     {
-        $city = $this->cityRepository->getCityBySlug($slug);
-        $boardingHouses = $this->boardingHouseRepository->getBoardingHouseByCitySlug($slug);
+        $city = $this->cityRepo->getCityBySlug($slug);
+        $boardingHouses = $this->boardingHouseRepo->getBoardingHouseByCitySlug($slug);
 
         return view('pages.city.show', compact('boardingHouses', 'city'));
     }

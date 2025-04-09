@@ -2,31 +2,11 @@
 
 namespace App\Interfaces;
 
-/**
- * Interface for transaction repository to manage transaction data in session.
- */
 interface TransactionRepositoryInterface
 {
-    /**
-     * Get transaction data from session.
-     *
-     * @return array|null
-     */
-    public function getTransactionDataFromSession();
+    public function getTransactionDataFromSession(): ?array;
 
-    /**
-     * Save transaction data to session.
-     *
-     * @param array $data
-     * @return void
-     */
-    public function saveTransactionDataToSession($data);
+    public function saveTransactionDataToSession(array $data): void;
 
-    /**
-     * Save the final transaction.
-     *
-     * @param array $data
-     * @return mixed
-     */
-    public function saveTransaction($data);
+    public function saveTransaction(array $data);
 }

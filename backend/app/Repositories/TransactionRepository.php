@@ -6,28 +6,14 @@ use App\Interfaces\TransactionRepositoryInterface;
 use App\Models\Room;
 use App\Models\Transaction;
 
-/**
- * Repository to manage transaction data in session and database.
- */
 class TransactionRepository implements TransactionRepositoryInterface
 {
-    /**
-     * Get transaction data from session.
-     *
-     * @return array|null
-     */
-    public function getTransactionDataFromSession()
+    public function getTransactionDataFromSession(): ?array
     {
         return session()->get('transaction');
     }
 
-    /**
-     * Save or update transaction data in session.
-     *
-     * @param array $data
-     * @return void
-     */
-    public function saveTransactionDataToSession($data)
+    public function saveTransactionDataToSession(array $data): void
     {
         $transaction = session()->get('transaction', []);
 
@@ -38,12 +24,6 @@ class TransactionRepository implements TransactionRepositoryInterface
         session()->put('transaction', $transaction);
     }
 
-    /**
-     * Save transaction data to database and clear session.
-     *
-     * @param array $data
-     * @return \App\Models\Transaction
-     */
     public function saveTransaction($data)
     {
         $room = Room::find($data['room_id']);
@@ -55,13 +35,6 @@ class TransactionRepository implements TransactionRepositoryInterface
         return $transaction;
     }
 
-    /**
-     * Prepare transaction data with code, status, date, and total amount.
-     *
-     * @param array $data
-     * @param \App\Models\Room $room
-     * @return array
-     */
     private function prepareTransactionData($data, $room)
     {
         $data['code'] = $this->generateTransactionCode();
@@ -74,23 +47,11 @@ class TransactionRepository implements TransactionRepositoryInterface
         return $data;
     }
 
-    /**
-     * Generate unique transaction code.
-     *
-     * @return string
-     */
     private function generateTransactionCode()
     {
         return 'NGK-' . strtoupper(uniqid());
     }
 
-    /**
-     * Calculate total transaction amount with tax and insurance.
-     *
-     * @param int|float $pricePerMonth
-     * @param int $duration
-     * @return float
-     */
     private function calculateTotalAmount($pricePerMonth, $duration)
     {
         $subtotal = $pricePerMonth * $duration;
@@ -100,13 +61,6 @@ class TransactionRepository implements TransactionRepositoryInterface
         return $subtotal + $tax + $insurance;
     }
 
-    /**
-     * Calculate final payment amount based on payment method.
-     *
-     * @param float $total
-     * @param string $paymentMethod
-     * @return float
-     */
     private function calculatePaymentAmount($total, $paymentMethod)
     {
         return $paymentMethod === 'full_payment' ? $total : $total * 0.3;

@@ -10,11 +10,6 @@ class Room extends Model
 {
     use HasFactory, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
     protected $fillable = [
         'boarding_house_id',
         'name',
@@ -25,21 +20,11 @@ class Room extends Model
         'is_available',
     ];
 
-    /**
-     * Get the boarding house associated with the room.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function boardingHouse()
     {
         return $this->belongsTo(BoardingHouse::class);
     }
 
-    /**
-     * Get the images associated with the room.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function images()
     {
         return $this->hasMany(RoomImage::class);
