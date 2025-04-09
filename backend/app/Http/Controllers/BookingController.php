@@ -6,109 +6,92 @@ use App\Http\Requests\CustomerInformationStoreRequest;
 use App\Interfaces\BoardingHouseRepositoryInterface;
 use App\Interfaces\TransactionRepositoryInterface;
 use Illuminate\Http\Request;
+use Midtrans\Config as MidtransConfig;
+use Midtrans\Snap;
 
-/**
- * Controller for handling booking-related actions.
- */
 class BookingController extends Controller
 {
-    private BoardingHouseRepositoryInterface $boardingHouseRepository;
-    private TransactionRepositoryInterface $transactionRepository;
+    private BoardingHouseRepositoryInterface $boardingHouseRepo;
+    private TransactionRepositoryInterface $transactionRepo;
 
-    /**
-     * BookingController constructor.
-     *
-     * @param BoardingHouseRepositoryInterface $boardingHouseRepository
-     * @param TransactionRepositoryInterface $transactionRepository
-     */
     public function __construct(
-        BoardingHouseRepositoryInterface $boardingHouseRepository,
-        TransactionRepositoryInterface $transactionRepository
+        BoardingHouseRepositoryInterface $boardingHouseRepo,
+        TransactionRepositoryInterface $transactionRepo
     ) {
-        $this->boardingHouseRepository = $boardingHouseRepository;
-        $this->transactionRepository = $transactionRepository;
+        $this->boardingHouseRepo = $boardingHouseRepo;
+        $this->transactionRepo = $transactionRepo;
     }
 
-    /**
-     * Handle booking request and store data in session.
-     *
-     * @param Request $request
-     * @param string $slug
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function booking(Request $request, $slug)
+    public function booking(Request $request, string $slug)
     {
-        $this->transactionRepository->saveTransactionDataToSession($request->all());
+        $this->transactionRepo->saveTransactionDataToSession($request->all());
         return redirect()->route('booking.information', $slug);
     }
 
-    /**
-     * Show the booking check page.
-     *
-     * @return \Illuminate\View\View
-     */
     public function check()
     {
         return view('pages.check-booking');
     }
 
-    /**
-     * Show the booking information form.
-     *
-     * @param string $slug
-     * @return \Illuminate\View\View
-     */
-    public function information($slug)
+    public function information(string $slug)
     {
-        $transaction = $this->transactionRepository->getTransactionDataFromSession();
-        $boardingHouse = $this->boardingHouseRepository->getBoardingHouseBySlug($slug);
-        $room = $this->boardingHouseRepository->getBoardingHouseRoomById($transaction['room_id']);
-
+        [$transaction, $boardingHouse, $room] = $this->getBookingContext($slug);
         return view('pages.booking.information', compact('transaction', 'boardingHouse', 'room'));
     }
 
-    /**
-     * Save customer information from the booking form.
-     *
-     * @param CustomerInformationStoreRequest $request
-     * @param string $slug
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function saveInformation(CustomerInformationStoreRequest $request, $slug)
+    public function saveInformation(CustomerInformationStoreRequest $request, string $slug)
     {
-        $data = $request->validated();
-        $this->transactionRepository->saveTransactionDataToSession($data);
-
+        $this->transactionRepo->saveTransactionDataToSession($request->validated());
         return redirect()->route('booking.checkout', $slug);
     }
 
-    /**
-     * Show the booking checkout page.
-     *
-     * @param string $slug
-     * @return \Illuminate\View\View
-     */
-    public function checkout($slug)
+    public function checkout(string $slug)
     {
-        $transaction = $this->transactionRepository->getTransactionDataFromSession();
-        $boardingHouse = $this->boardingHouseRepository->getBoardingHouseBySlug($slug);
-        $room = $this->boardingHouseRepository->getBoardingHouseRoomById($transaction['room_id']);
-
+        [$transaction, $boardingHouse, $room] = $this->getBookingContext($slug);
         return view('pages.booking.checkout', compact('transaction', 'boardingHouse', 'room'));
     }
 
-    /**
-     * Handle the payment and save the final transaction.
-     *
-     * @param Request $request
-     * @return void
-     */
     public function payment(Request $request)
     {
-        $this->transactionRepository->saveTransactionDataToSession($request->all());
+        $this->transactionRepo->saveTransactionDataToSession($request->all());
 
-        $transaction = $this->transactionRepository->saveTransaction(
-            $this->transactionRepository->getTransactionDataFromSession()
+        $transaction = $this->transactionRepo->saveTransaction(
+            $this->transactionRepo->getTransactionDataFromSession()
         );
+
+        $this->configureMidtrans();
+
+        $params = [
+            'transaction_details' => [
+                'order_id' => $transaction->code,
+                'gross_amount' => $transaction->total_amount,
+            ],
+            'customer_details' => [
+                'first_name' => $transaction->name,
+                'email' => $transaction->email,
+                'phone' => $transaction->phone_number,
+            ],
+        ];
+
+        $paymentUrl = Snap::createTransaction($params)->redirect_url;
+
+        return redirect($paymentUrl);
+    }
+
+    private function getBookingContext(string $slug): array
+    {
+        $transaction = $this->transactionRepo->getTransactionDataFromSession();
+        $boardingHouse = $this->boardingHouseRepo->getBoardingHouseBySlug($slug);
+        $room = $this->boardingHouseRepo->getBoardingHouseRoomById($transaction['room_id']);
+
+        return [$transaction, $boardingHouse, $room];
+    }
+
+    private function configureMidtrans(): void
+    {
+        MidtransConfig::$serverKey = config('midtrans.serverKey');
+        MidtransConfig::$isProduction = config('midtrans.isProduction');
+        MidtransConfig::$isSanitized = config('midtrans.isSanitized');
+        MidtransConfig::$is3ds = config('midtrans.is3ds');
     }
 }
