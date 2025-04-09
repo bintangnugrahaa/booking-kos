@@ -145,15 +145,15 @@
                         </div>
                     @endforeach
                 </div>
-                <div id="Rules-Tab" class="tab-content flex-col gap-5 hidden">Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Mollitia, in? Magni recusandae, suscipit nobis numquam ratione ab harum similique,
-                    dolorum exercitationem explicabo iusto.</div>
-                <div id="Contact-Tab" class="tab-content flex-col gap-5 hidden">Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Mollitia, in? Magni recusandae, suscipit nobis numquam ratione ab harum similique,
-                    dolorum exercitationem explicabo iusto.</div>
-                <div id="Rewards-Tab" class="tab-content flex-col gap-5 hidden">Lorem ipsum dolor sit amet consectetur
-                    adipisicing elit. Mollitia, in? Magni recusandae, suscipit nobis numquam ratione ab harum similique,
-                    dolorum exercitationem explicabo iusto.</div>
+                <div id="Rules-Tab" class="tab-content flex-col gap-5 hidden">Boarding house ini memiliki peraturan yang
+                    wajib dipatuhi oleh seluruh penghuni, seperti menjaga kebersihan, tidak merokok di area kost, tidak
+                    membawa tamu lawan jenis ke dalam kamar, serta mematuhi jam malam dan jadwal pembayaran bulanan.</div>
+                <div id="Contact-Tab" class="tab-content flex-col gap-5 hidden">Untuk informasi lebih lanjut, silakan
+                    hubungi pengelola melalui WhatsApp di 0851-5534-4998 atau email ke info.ngekos@gmail.com. Respon cepat
+                    juga tersedia melalui akun Instagram resmi boarding house ini.</div>
+                <div id="Rewards-Tab" class="tab-content flex-col gap-5 hidden">Penghuni berkesempatan mendapatkan rewards
+                    menarik seperti diskon sewa jangka panjang, cashback jika mereferensikan teman, serta bonus fasilitas
+                    tambahan seperti laundry gratis atau perlengkapan kamar selama masa tinggal.</div>
             </div>
         </main>
         <div id="BottomNav" class="relative flex w-full h-[138px] shrink-0">
