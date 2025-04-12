@@ -159,5 +159,4 @@
         const defaultPrice = {{ $room->price_per_month }};
     </script>
     <script src="{{ asset('assets/js/cust-info.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 @endsection
