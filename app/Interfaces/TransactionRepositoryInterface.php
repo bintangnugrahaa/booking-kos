@@ -11,4 +11,6 @@ interface TransactionRepositoryInterface
     public function saveTransaction(array $data);
 
     public function getTransactionByCode(string $code);
+
+    public function getTransactionByCodeEmailPhone(string $code, string $email, string $phone);
 }
