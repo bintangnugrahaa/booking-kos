@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BookingShowRequest;
 use App\Http\Requests\CustomerInformationStoreRequest;
 use App\Interfaces\BoardingHouseRepositoryInterface;
 use App\Interfaces\TransactionRepositoryInterface;
@@ -22,46 +23,47 @@ class BookingController extends Controller
         $this->transactionRepo = $transactionRepo;
     }
 
-    public function booking(Request $request, string $slug)
+    public function startBooking(Request $request, string $slug)
     {
         $this->transactionRepo->saveTransactionDataToSession($request->all());
+
         return redirect()->route('booking.information', $slug);
     }
 
-    public function check()
+    public function showBookingCheckForm()
     {
-        return view('pages.check-booking');
+        return view('pages.booking.check-booking');
     }
 
-    public function information(string $slug)
+    public function showInformationForm(string $slug)
     {
         [$transaction, $boardingHouse, $room] = $this->getBookingContext($slug);
 
         return view('pages.booking.information', compact('transaction', 'boardingHouse', 'room'));
     }
 
-    public function saveInformation(CustomerInformationStoreRequest $request, string $slug)
+    public function storeCustomerInformation(CustomerInformationStoreRequest $request, string $slug)
     {
         $this->transactionRepo->saveTransactionDataToSession($request->validated());
 
         return redirect()->route('booking.checkout', $slug);
     }
 
-    public function checkout(string $slug)
+    public function showCheckoutPage(string $slug)
     {
         [$transaction, $boardingHouse, $room] = $this->getBookingContext($slug);
 
         return view('pages.booking.checkout', compact('transaction', 'boardingHouse', 'room'));
     }
 
-    public function payment(Request $request)
+    public function redirectToPaymentGateway(Request $request)
     {
         $this->transactionRepo->saveTransactionDataToSession($request->all());
 
         $transactionData = $this->transactionRepo->getTransactionDataFromSession();
         $transaction = $this->transactionRepo->saveTransaction($transactionData);
 
-        $this->configureMidtrans();
+        $this->setupMidtransConfig();
 
         $params = [
             'transaction_details' => [
@@ -80,12 +82,28 @@ class BookingController extends Controller
         return redirect($paymentUrl);
     }
 
-    public function success(Request $request)
+    public function showSuccessPage(Request $request)
     {
         $transaction = $this->transactionRepo->getTransactionByCode($request->order_id);
 
         return view('pages.booking.success', compact('transaction'));
     }
+
+    public function showTransactionDetails(BookingShowRequest $request)
+    {
+        $transaction = $this->transactionRepo->getTransactionByCodeEmailPhone(
+            $request->code,
+            $request->email,
+            $request->phone_number
+        );
+
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Data Transaksi Tidak Ditemukan');
+        }
+
+        return view('pages.booking.detail', compact('transaction'));
+    }
+
 
     private function getBookingContext(string $slug): array
     {
@@ -96,7 +114,10 @@ class BookingController extends Controller
         return [$transaction, $boardingHouse, $room];
     }
 
-    private function configureMidtrans(): void
+    /**
+     * Konfigurasi Midtrans.
+     */
+    private function setupMidtransConfig(): void
     {
         MidtransConfig::$serverKey = config('midtrans.serverKey');
         MidtransConfig::$isProduction = config('midtrans.isProduction');
