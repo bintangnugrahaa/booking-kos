@@ -27,7 +27,6 @@ class TransactionRepository implements TransactionRepositoryInterface
     public function saveTransaction(array $data): Transaction
     {
         $room = Room::findOrFail($data['room_id']);
-
         $data = $this->prepareTransactionData($data, $room);
 
         $transaction = Transaction::create($data);
@@ -40,6 +39,14 @@ class TransactionRepository implements TransactionRepositoryInterface
     public function getTransactionByCode(string $code): ?Transaction
     {
         return Transaction::where('code', $code)->first();
+    }
+
+    public function getTransactionByCodeEmailPhone(string $code, string $email, string $phone): ?Transaction
+    {
+        return Transaction::where('code', $code)
+            ->where('email', $email)
+            ->where('phone_number', $phone)
+            ->first();
     }
 
     private function prepareTransactionData(array $data, Room $room): array
